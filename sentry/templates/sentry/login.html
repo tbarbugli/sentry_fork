@@ -1,10 +1,12 @@
-{% extends "sentry/index.html" %}
+{% extends "sentry/layout.html" %}
 
 {% load sentry_helpers %}
 
-{% block title %}Login | Sentry{% endblock %}
+{% block title %}Login | {{ block.super }}{% endblock %}
 
 {% block heading %}Login{% endblock %}
+
+{% block search %}{% endblock %}
 
 {% block content %}
     <div id="body">
