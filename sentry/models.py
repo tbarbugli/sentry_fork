@@ -114,12 +114,14 @@ class MessageBase(Model):
         return self.message.split('\n')[0]
 
 class GroupedMessage(MessageBase):
-    status          = models.PositiveIntegerField(default=0, choices=STATUS_LEVELS, db_index=True)
-    times_seen      = models.PositiveIntegerField(default=1)
-    last_seen       = models.DateTimeField(default=datetime.datetime.now, db_index=True)
-    first_seen      = models.DateTimeField(default=datetime.datetime.now, db_index=True)
+    status                  = models.PositiveIntegerField(default=0, choices=STATUS_LEVELS, db_index=True)
+    times_seen              = models.PositiveIntegerField(default=1)
+    last_seen               = models.DateTimeField(default=datetime.datetime.now, db_index=True)
+    first_seen              = models.DateTimeField(default=datetime.datetime.now, db_index=True)
+    #last_notification       = models.DateTimeField(default=datetime.datetime.now, db_index=True)
+    #notification_interval   = models.DateTimeField(default=datetime.datetime.now, db_index=True)
 
-    objects         = GroupedMessageManager()
+    objects                 = GroupedMessageManager()
 
     class Meta:
         unique_together = (('logger', 'view', 'checksum'),)
