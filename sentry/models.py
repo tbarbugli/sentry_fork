@@ -113,7 +113,7 @@ class GroupedMessage(MessageBase):
     times_seen      = models.PositiveIntegerField(default=1, db_index=True)
     last_seen       = models.DateTimeField(default=datetime.now, db_index=True)
     first_seen      = models.DateTimeField(default=datetime.now, db_index=True)
-
+    last_email_sent = models.DateTimeField(default=None, null= True)
     score           = models.IntegerField(default=0)
     
     objects         = GroupedMessageManager()
@@ -146,7 +146,7 @@ class GroupedMessage(MessageBase):
 
         if not settings.ADMINS:
             return
-        
+
         message = self.message_set.order_by('-id')[0]
 
         obj_request = message.request
@@ -174,7 +174,8 @@ class GroupedMessage(MessageBase):
             'traceback': message.traceback,
             'link': link,
         })
-        
+        self.last_email_sent = datetime.now()
+        self.save()
         send_mail(subject, body,
                   settings.SERVER_EMAIL, settings.ADMINS,
                   fail_silently=fail_silently)
