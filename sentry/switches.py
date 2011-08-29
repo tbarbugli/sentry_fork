@@ -11,11 +11,10 @@ class Switch(object):
     WAKEUP_PERIOD = 24 * 3600
     SKIP_LOGGERS = ('http404',)
 
-    def __init__(self, group, class_name= None, logger_name= None):
+    def __init__(self, group, logger_name= None):
         self.last_seen = group.last_seen
         self.last_email_sent = group.last_email_sent
         self.group = group
-        self.class_name = class_name
         self.logger_name = logger_name
 
     def send_email(self):
