@@ -137,9 +137,12 @@ class SentryManager(models.Manager):
             except Exception, exc:
                 warnings.warn(u'Unable to process log entry: %s' % (exc,))
         else:
-            module, class_name = settings.SENTRY_EMAIL_SWITCH.rsplit('.', 1)
-            _switch = getattr(__import__(module, {}, {}, class_name), class_name)
-            mail = mail or _switch(group).send_email()
+            #try to run mail resend switch class
+            try:
+                module, class_name = settings.SENTRY_EMAIL_SWITCH.rsplit('.', 1)
+                _switch = getattr(__import__(module, {}, {}, class_name), class_name)
+                mail = mail or _switch(group, logger_name).send_email()
+            except: pass
             if mail:
                 group.mail_admins()
             return instance
