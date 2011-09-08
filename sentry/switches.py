@@ -7,7 +7,7 @@ class Switch(object):
     same group.
     Does not send email for loggers in SKIP_LOGGERS
     """
-    AMOUNT_TRIGGER = 10
+    AMOUNT_TRIGGER = 100
     WAKEUP_PERIOD = 24 * 3600
     SKIP_LOGGERS = ('http404',)
 

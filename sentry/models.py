@@ -176,9 +176,11 @@ class GroupedMessage(MessageBase):
         })
         self.last_email_sent = datetime.now()
         self.save()
-        send_mail(subject, body,
-                  settings.SERVER_EMAIL, settings.ADMINS,
-                  fail_silently=fail_silently)
+        try:
+            send_mail(subject, body,
+                    settings.SERVER_EMAIL, settings.ADMINS)
+        except Exception, exc:
+            logger.exception(u'Unable to send emails: %s' % (exc,))
     
     @property
     def unique_urls(self):
