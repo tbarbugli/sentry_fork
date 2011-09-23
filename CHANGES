@@ -1,3 +1,137 @@
+1.8.9
+
+* Safely handle unpickling objects that may not have been stored in a
+  valid format.
+
+1.8.8
+
+* Changed ``sentry cleanup`` to use a range query.
+
+1.8.7
+
+* Added "Clear Feed" option.
+* Version information will be read from pkg_resources if possible.
+* Cleared up documentation on configuration settings..
+* Performance improvements to ``Client.send()``.
+* Added default 404/500 pages.
+* Added support for Django's LOGIN_URL setting.
+* Fixed a memory leak in the client (thanks to Ben Bangert).
+
+1.8.6.2
+
+* Reverted change which required distribute.
+* Cleaned up configuration defaults.
+
+1.8.6.1
+
+* Include distribute_setup.py in the MANIFEST to ship it in sdists.
+
+1.8.6
+
+* Corrected an issue which was causing certain settings (like WEB_HOST) to
+  not take affect in custom configuration files.
+* The Sentry server will now pull in default server settings, as well as
+  ~/.sentry/sentry.conf.py if --config is not passed to it.
+
+1.8.5.1
+
+* Fixed a bug which caused thrashing prevention to not function correctly.
+* Corrected an error in transform()'s recursion safety.
+* Changed packaging to use Distribute.
+
+1.8.5
+
+* Pulled test suite out of the Sentry namespace to avoid conflicts in projects.
+
+1.8.4.2
+
+* Added missing invalid_message_id template.
+
+1.8.4.1
+
+* Fixed an error that was causing LOG_LEVELS to not display correctly.
+
+1.8.4
+
+* The Sentry base client will now pass along the timestamp from when the
+  message was generated.
+
+1.8.3.1
+
+* Fixed a case where the client may hit a transaction aborted error when
+  transforming variables.
+
+1.8.3
+
+* Added several settings which were Django specific so that they can be
+  configured isolated to the Sentry instance.
+* Graceful failover for when a cache backend isnt working properly and
+  throttling is enabled.
+* Better rendering of non-dict variables when passed within extra data.
+* Graceful failover for searching on message_id's that aren't found.
+
+1.8.0
+
+* Refactored Sentry server to run standalone (sentry --help).
+
+1.7.5
+
+* Implemented new client/server storage API and signing methods.
+* Fixed a bug where accessing __sentry__ would sometimes cause errors on
+  certain code paths.
+
+1.7.4
+
+* Fixed a bug with potential recursion issues.
+* Fixed a bug with the storage API and unicode keys.
+
+1.7.3
+
+* Storage API has better responses when data fails to decode, or
+  you send a bad request.
+* Documentation improvements for JSON storage API.
+
+1.7.2
+
+* All strings, lists, tuples, and sets are now shortened before sending
+  to the server. Iterable data structures are truncated to the first
+  50 items, and strings are truncated to the first 200 characters.
+  
+  Both shorteners have configurable values in the settings.
+
+1.7.1
+
+* Fixed a bug that slipped through with blocktrans usage.
+
+1.7.0
+
+* Added ``score`` to ``GroupedMessage`` (schema change).
+* Added ``MessageIndex`` (schema change).
+* Added Async client (thanks to Yuri Baburov).
+* Added support for raw_post_data (thanks to Matthew Schinckel).
+* django-paging and django-indexer no longer need to be in INSTALLED_APPS.
+* Added an index for GroupedMessages.times_seen.
+* The ``score`` column will update atomically in PostgreSQL and MySQL.
+* Added the frequency sort option.
+* Better internationalization support.
+* Fixed a bug with Oracle's date truncation support (changed to hh24).
+* Respect TIME_ZONE by using auto_now_* on DateTimeField's.
+* Tests required Haystack and Celery are now skipped if module is not found.
+
+1.6.10
+
+* Added JSON support to storage API.
+* Changed default client to use JSON format.
+
+1.6.9.1
+
+* Fixed an issue with encoding to UTF-8 for Haystack.
+
+1.6.9
+
+* Added URLs to default search parameters.
+* Fixed a bug to ensure template information is only added if its the correct loader
+
 1.6.8.1
 
 * Search will now show when unauthenticated (e.g. when SENTRY_PUBLIC is enabled)

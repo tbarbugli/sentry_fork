@@ -1,9 +1,19 @@
+# XXX: Import django-paging's template tags so we dont have to worry about
+#      INSTALLED_APPS
 from django import template
 from django.db.models import Count
-from django.utils import simplejson
+from django.utils.safestring import mark_safe
+from django.template import RequestContext
 from django.template.defaultfilters import stringfilter
-
+from django.template.loader import render_to_string
+from paging.helpers import paginate as paginate_func
+from sentry.utils import json
+from sentry.utils import get_db_engine
+from sentry.utils.compat.db import connections
+from django.utils.translation import ugettext as _
 from sentry.plugins import GroupActionProvider
+from templatetag_sugar.register import tag
+from templatetag_sugar.parser import Name, Variable, Constant, Optional
 
 import datetime
 
@@ -48,17 +58,21 @@ def num_digits(value):
 @register.filter
 def chart_data(group, max_days=90):
     hours = max_days*24
-    
+
     today = datetime.datetime.now().replace(microsecond=0, second=0, minute=0)
     min_date = today - datetime.timedelta(hours=hours)
 
     if hasattr(group, '_state'):
-        from django.db import connections
-        conn = connections[group._state.db]
+        db = group._state.db
     else:
-        from django.db import connection as conn
+        db = 'default'
 
-    method = conn.ops.date_trunc_sql('hour', 'datetime')
+    conn = connections[db]
+
+    if get_db_engine(getattr(conn, 'alias', 'default')).startswith('oracle'):
+        method = conn.ops.date_trunc_sql('hh24', 'datetime')
+    else:
+        method = conn.ops.date_trunc_sql('hour', 'datetime')
 
     chart_qs = list(group.message_set.all()\
                       .filter(datetime__gte=min_date)\
@@ -83,12 +97,11 @@ def chart_data(group, max_days=90):
 
 @register.filter
 def to_json(data):
-    return simplejson.dumps(data)
+    return json.dumps(data)
 
 @register.simple_tag
 def sentry_version():
     import sentry
-    
     return sentry.VERSION
 
 @register.filter
@@ -130,15 +143,15 @@ def get_tags(group, request):
 def timesince(value):
     from django.template.defaultfilters import timesince
     if not value:
-        return 'Never'
+        return _('Never')
     if value < datetime.datetime.now() - datetime.timedelta(days=5):
         return value.date()
     value = (' '.join(timesince(value).split(' ')[0:2])).strip(',')
-    if value == '0 minutes':
-        return 'Just now'
-    if value == '1 day':
-        return 'Yesterday'
-    return value + ' ago'
+    if value == _('0 minutes'):
+        return _('Just now')
+    if value == _('1 day'):
+        return _('Yesterday')
+    return value + _(' ago')
 
 @register.filter(name='truncatechars')
 @stringfilter
@@ -156,3 +169,22 @@ def truncatechars(value, arg):
         return value[:length] + '...'
     return value
 truncatechars.is_safe = True
+
+# XXX: this is taken from django-paging so that we may render
+#      a custom template, and not worry about INSTALLED_APPS
+@tag(register, [Variable('queryset_or_list'),
+                Constant('from'), Variable('request'),
+                Optional([Constant('as'), Name('asvar')]),
+                Optional([Constant('per_page'), Variable('per_page')]),
+                Optional([Variable('is_endless')])])
+def paginate(context, queryset_or_list, request, asvar, per_page=25, is_endless=True):
+    """{% paginate queryset_or_list from request as foo[ per_page 25][ is_endless False %}"""
+    context_instance = RequestContext(request)
+    paging_context = paginate_func(request, queryset_or_list, per_page, endless=is_endless)
+    paging = mark_safe(render_to_string('sentry/partial/_pager.html', paging_context, context_instance))
+
+    result = dict(objects=paging_context['paginator'].get('objects', []), paging=paging)
+    if asvar:
+        context[asvar] = result
+        return ''
+    return result

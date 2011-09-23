@@ -1,9 +1,9 @@
 {% extends "sentry/group/details.html" %}
 
-{% load paging_extras %}
+{% load i18n %}
 {% load sentry_helpers %}
 
-{% block title %}{{ group.error }} | Sentry{% endblock %}
+{% block title %}{{ group.error }} | {{ block.super }}{% endblock %}
 
 {% block inner %}
     <ul class="messages" id="message_list">
@@ -26,23 +26,22 @@
                         <span class="tag tag-version">{{ version.0 }} {{ version.1 }}</span> 
                     {% endif %}
                 {% endwith %}
-                <span class="last_seen">{{ message.datetime|timesince }}</span>
+                <span class="last_seen" title="{{ message.datetime }}">{{ message.datetime|timesince }}</span>
             </p>
         </li>
-        
     </ul>
 
+    {% if message.has_two_part_message %}
+        <h2>{% trans "Full Message" %}</h2>
+        <pre id="full-message">{{ message.message }}</pre>
+    {% endif %}
+
     {% if traceback %}
-
-        <h2>Traceback</h2>
-
         {{ traceback }}
-
     {% endif %}
 
     <div id="requestinfo">
-        <h2>More Information</h2>
-
+        <h2>{% trans "Additional Data" %}</h2>
         <table>
             {% for k, v in json_data %}
                 <tr>
@@ -53,8 +52,8 @@
                             <table class="vars">
                                 <thead>
                                     <tr>
-                                        <th>Variable</th>
-                                        <th>Value</th>
+                                        <th>{% trans "Variable" %}</th>
+                                        <th>{% trans "Value" %}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -67,10 +66,10 @@
                                 </tbody>
                             </table>
                         {% else %}
-                            {{ v|pprint }}
+                            <pre>{{ v|pprint }}</pre>
                         {% endif %}
                     {% else %}
-                        <p>No data for {{ k }}</p>
+                        <p>{% blocktrans with k as varname %}No data for {{ varname }}{% endblocktrans %}</p>
                     {% endif %}
                     </td>
                 </tr>
