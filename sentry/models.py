@@ -19,6 +19,8 @@ from sentry.utils.manager import GroupedMessageManager, SentryManager
 
 from indexer.models import BaseIndex
 
+from sentry.utils.fields import URLTextField
+
 try:
     from idmapper.models import SharedMemoryModel as Model
 except ImportError:
@@ -217,7 +219,7 @@ class Message(MessageBase):
     message_id      = models.CharField(max_length=32, null=True, unique=True)
     group           = models.ForeignKey(GroupedMessage, blank=True, null=True, related_name="message_set")
     datetime        = models.DateTimeField(default=datetime.now, db_index=True)
-    url             = models.URLField(verify_exists=False, null=True, blank=True)
+    url             = URLTextField(verify_exists=False, null=True, blank=True)
     server_name     = models.CharField(max_length=128, db_index=True)
     site            = models.CharField(max_length=128, db_index=True, null=True)
 
