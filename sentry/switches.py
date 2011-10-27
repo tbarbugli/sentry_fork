@@ -8,7 +8,7 @@ class Switch(object):
     Does not send email for loggers in SKIP_LOGGERS
     """
     AMOUNT_TRIGGER = 100
-    WAKEUP_PERIOD = 24 * 3600
+    WAKEUP_PERIOD = 12 * 30 * 24 * 3600 #more or less an year
     SKIP_LOGGERS = ('http404',)
 
     def __init__(self, group, logger_name= None):
