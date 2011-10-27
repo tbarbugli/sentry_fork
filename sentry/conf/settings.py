@@ -13,6 +13,11 @@ KEY = getattr(settings, 'SENTRY_KEY', md5_constructor(settings.SECRET_KEY).hexdi
 EMAIL_SUBJECT_PREFIX = getattr(settings, 'EMAIL_SUBJECT_PREFIX', EMAIL_SUBJECT_PREFIX)
 INTERNAL_IPS = getattr(settings, 'INTERNAL_IPS', INTERNAL_IPS)
 SERVER_EMAIL = getattr(settings, 'SERVER_EMAIL', SERVER_EMAIL)
+# SENTRY_EXCEPTION_GROUP_LIST = {
+#     "TypeError": "Type error grouping",
+#     "TypeError:unsupported operand type(s) for +: 'int' and 'str'": "exception class and message grouping"
+# }
+EXCEPTION_GROUP_LIST = getattr(settings, 'EXCEPTION_GROUP_LIST', set(['']))
 
 for k in dir(settings):
     if k.startswith('SENTRY_'):

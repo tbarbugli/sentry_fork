@@ -44,6 +44,15 @@ class SentryManager(models.Manager):
             qs = qs.using(settings.DATABASE_USING)
         return qs
 
+    def _get_group_by_view(self, kwargs):
+        type_message_match = "%s:%s" % (kwargs.get('class_name'), kwargs.get('message'))
+        type_match = kwargs.get('class_name')
+        if type_message_match in settings.EXCEPTION_GROUP_LIST:
+            return settings.EXCEPTION_GROUP_LIST[type_message_match]
+        if type_match in settings.EXCEPTION_GROUP_LIST:
+            return settings.EXCEPTION_GROUP_LIST[type_match]
+        return None
+
     def from_kwargs(self, **kwargs):
         from sentry.models import Message, GroupedMessage, FilterValue
         URL_MAX_LENGTH = Message._meta.get_field_by_name('url')[0].max_length
@@ -81,13 +90,16 @@ class SentryManager(models.Manager):
                 'last_seen': now,
                 'first_seen': now,
             })
-
+            gc_kwargs = dict(logger=logger_name, checksum=checksum)            
+            group_name = self._get_group_by_view(kwargs)
+            if group_name is not None:
+                gc_kwargs['view'] = group_name
+                gc_kwargs['class_name'] = group_kwargs.pop('class_name', None)
+                group_kwargs['checksum'] = gc_kwargs.pop('checksum', None)
             group, created = GroupedMessage.objects.get_or_create(
-                view=view,
-                logger=logger_name,
-                checksum=checksum,
                 # we store some sample data for rendering
-                defaults=group_kwargs
+                defaults=group_kwargs,
+                **gc_kwargs
             )
             kwargs.pop('data', None)
             if not created:
