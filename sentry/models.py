@@ -147,14 +147,16 @@ class GroupedMessage(MessageBase):
 
         if not settings.ADMINS:
             return
-
+        label = ""
         message = self.message_set.order_by('-id')[0]
 
         obj_request = message.request
+        if self.last_email_sent is not None:
+            label = "[ RECURRENT ]"
 
         ip_repr = (obj_request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL')
 
-        subject = '%sError (%s IP): %s' % (settings.EMAIL_SUBJECT_PREFIX, ip_repr, obj_request.path)
+        subject = '%s %sError (%s IP): %s' % (label, settings.EMAIL_SUBJECT_PREFIX, ip_repr, obj_request.path)
 
         if message.site:
             subject  = '[%s] %s' % (message.site, subject)
