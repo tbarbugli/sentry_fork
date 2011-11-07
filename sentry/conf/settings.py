@@ -14,8 +14,8 @@ EMAIL_SUBJECT_PREFIX = getattr(settings, 'EMAIL_SUBJECT_PREFIX', EMAIL_SUBJECT_P
 INTERNAL_IPS = getattr(settings, 'INTERNAL_IPS', INTERNAL_IPS)
 SERVER_EMAIL = getattr(settings, 'SERVER_EMAIL', SERVER_EMAIL)
 # SENTRY_EXCEPTION_GROUP_LIST = {
-#     "TypeError": "Type error grouping",
-#     "TypeError:unsupported operand type(s) for +: 'int' and 'str'": "exception class and message grouping"
+#     ("DatabaseError", ".*"): "exception class grouping",
+#     ("TypeError", "unsupported operand type(s) for +: '\w+' and '\w+'"): "grouping on exception class and exception message"
 # }
 EXCEPTION_GROUP_LIST = getattr(settings, 'EXCEPTION_GROUP_LIST', set(['']))
 

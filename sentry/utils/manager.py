@@ -8,6 +8,7 @@ from django.db.models import signals
 
 from sentry.conf import settings
 from sentry.utils import construct_checksum, get_db_engine
+import re
 
 assert not settings.DATABASE_USING or django.VERSION >= (1, 2), 'The `SENTRY_DATABASE_USING` setting requires Django >= 1.2'
 
@@ -45,12 +46,11 @@ class SentryManager(models.Manager):
         return qs
 
     def _get_group_by_view(self, kwargs):
-        type_message_match = "%s:%s" % (kwargs.get('class_name'), kwargs.get('message'))
-        type_match = kwargs.get('class_name')
-        if type_message_match in settings.EXCEPTION_GROUP_LIST:
-            return settings.EXCEPTION_GROUP_LIST[type_message_match]
-        if type_match in settings.EXCEPTION_GROUP_LIST:
-            return settings.EXCEPTION_GROUP_LIST[type_match]
+        class_name = kwargs.get("class_name", "")
+        message = kwargs.get("message", "")
+        for k in settings.EXCEPTION_GROUP_LIST.iterkeys():
+            if re.search(k[0], class_name) and re.search(k[1], message):
+                return settings.EXCEPTION_GROUP_LIST[k]
         return None
 
     def from_kwargs(self, **kwargs):
@@ -90,12 +90,17 @@ class SentryManager(models.Manager):
                 'last_seen': now,
                 'first_seen': now,
             })
-            gc_kwargs = dict(logger=logger_name, checksum=checksum)            
-            group_name = self._get_group_by_view(kwargs)
+            gc_kwargs = dict(logger=logger_name, checksum=checksum)
+            try:
+                group_name = self._get_group_by_view(kwargs)
+            except:
+                group_name = None
             if group_name is not None:
-                gc_kwargs['view'] = group_name
-                gc_kwargs['class_name'] = group_kwargs.pop('class_name', None)
-                group_kwargs['checksum'] = gc_kwargs.pop('checksum', None)
+                # if the message should be grouped use the group_name to select
+                # existing groups (avoid more specific groups)
+                gc_kwargs = dict(view=group_name)
+                group_kwargs = {'class_name': kwargs.get("class_name"),
+                                'checksum': checksum, 'logger':logger_name}
             group, created = GroupedMessage.objects.get_or_create(
                 # we store some sample data for rendering
                 defaults=group_kwargs,
