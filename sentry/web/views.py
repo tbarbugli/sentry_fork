@@ -282,8 +282,32 @@ def ajax_handler(request):
         response = HttpResponse(json.dumps(data))
         response['Content-Type'] = 'application/json'
         return response
-        
-    if op in ['notification','poll','resolve', 'clear']:
+    
+    def _update_email_status(request, send):
+        gid = request.REQUEST.get('gid')
+        if not gid:
+            return HttpResponseForbidden()
+        try:
+            group = GroupedMessage.objects.get(pk=gid)
+        except GroupedMessage.DoesNotExist:
+            return HttpResponseForbidden()
+        GroupedMessage.objects.filter(pk=group.pk).update(send_email=send)
+
+    def suspend_emails(request):
+        _update_email_status(request, send=False)
+        data = []
+        response = HttpResponse(json.dumps(data))
+        response['Content-Type'] = 'application/json'
+        return response
+
+    def unsuspend_emails(request):
+        _update_email_status(request, send=True)
+        data = []
+        response = HttpResponse(json.dumps(data))
+        response['Content-Type'] = 'application/json'
+        return response
+
+    if op in ['notification','poll','resolve', 'clear', 'suspend_emails', 'unsuspend_emails']:
         return locals()[op](request)  
     else:
         return HttpResponseBadRequest()

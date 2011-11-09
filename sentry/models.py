@@ -118,6 +118,7 @@ class GroupedMessage(MessageBase):
     last_email_sent = models.DateTimeField(default=None, null= True)
     score           = models.IntegerField(default=0)
     objects         = GroupedMessageManager()
+    send_email      = models.BooleanField(default=True)
 
     class Meta:
         unique_together = (('logger', 'view', 'checksum'),)
@@ -146,6 +147,8 @@ class GroupedMessage(MessageBase):
         from django.template.loader import render_to_string
 
         if not settings.ADMINS:
+            return
+        if not self.send_email:
             return
         label = ""
         message = self.message_set.order_by('-id')[0]

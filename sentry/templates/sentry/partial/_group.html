@@ -20,4 +20,6 @@
     {% if group.status == 0 %}
         <a href="{% url sentry-ajax %}?op=resolve&amp;gid={{ group.pk }}" onclick="Sentry.stream.resolve({{ group.pk }});return false;" class="button resolve_button hidden">&#10003;</a>
     {% endif %}
+    <a href="{% url sentry-ajax %}?op=suspend_emails&amp;gid={{ group.pk }}" onclick="Sentry.stream.suspend({{ group.pk }});return false;" class="button switch {% if group.send_email %}on{% else %}off{% endif %}">STOP EMAIL</a>
+    <a href="{% url sentry-ajax %}?op=unsuspend_emails&amp;gid={{ group.pk }}" onclick="Sentry.stream.unsuspend({{ group.pk }});return false;" class="button switch {% if group.send_email %}off{% else %}on{% endif %}">RESTART EMAIL</a>
 </li>

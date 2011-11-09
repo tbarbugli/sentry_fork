@@ -430,14 +430,23 @@ dl.flat dd {
 .messages .traceback { display: none; }
 .messages li { clear: both; padding: 8px; position: relative; padding-right: 50px; overflow: hidden; }
 .messages .row1 { background: #f9f9f9; }
-.messages .hidden {
+
+.messages .off {
+    visibility: hidden;
+}
+
+.messages .hidden, .messages .on{
     position: absolute;
     right: 15px;
     top: 21px;
-    visibility: hidden;;
+    visibility: hidden;
 }
-.messages li:hover .hidden {
+.messages li:hover .hidden, .messages li:hover .on {
     visibility: visible;
+}
+
+.messages .on {
+    right: 50px;
 }
 
 .messages .row_link {

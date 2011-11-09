@@ -96,6 +96,27 @@ var Sentry = {};
             });
     	}
     }
+    Sentry.stream._switch_email = function(gid, op){
+        $.ajax({
+            url: Sentry.options.apiUrl,
+            type: 'get',
+            data: {'op': op, 'gid': gid},
+            success: function(){
+                 var o = $('#group_' + gid + ' .on');
+                 var n = $('#group_' + gid + ' .off');
+                 o.removeClass('on').addClass('off');
+                 n.removeClass('off').addClass('on');
+            }
+        });
+    }
+    Sentry.stream.suspend = function(gid){
+        this._switch_email(gid, "suspend_emails");
+    }
+    
+    Sentry.stream.unsuspend = function(gid){
+        this._switch_email(gid, "unsuspend_emails");
+    }
+    
     Sentry.stream.resolve = function(gid, remove){
         if (typeof(remove) == 'undefined') {
             remove = true;

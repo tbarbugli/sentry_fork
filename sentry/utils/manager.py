@@ -90,7 +90,7 @@ class SentryManager(models.Manager):
                 'last_seen': now,
                 'first_seen': now,
             })
-            gc_kwargs = dict(logger=logger_name, checksum=checksum)
+            gc_kwargs = dict(logger=logger_name, checksum=checksum, view=view)
             try:
                 group_name = self._get_group_by_view(kwargs)
             except:
