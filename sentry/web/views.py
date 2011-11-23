@@ -253,8 +253,11 @@ def ajax_handler(request):
         except GroupedMessage.DoesNotExist:
             return HttpResponseForbidden()
         
-        GroupedMessage.objects.filter(pk=group.pk).update(status=1)
-        group.status = 1
+        GroupedMessage.objects.filter(pk=group.pk).update(
+            status=1,
+            score=1,
+            times_seen=1,
+        )
         
         if not request.is_ajax():
             return HttpResponseRedirect(request.META.get('HTTP_REFERER') or reverse('sentry'))
@@ -273,7 +276,11 @@ def ajax_handler(request):
         return response
     
     def clear(request):
-        GroupedMessage.objects.all().update(status=1)
+        GroupedMessage.objects.all().update(
+            status=1,
+            score=1,
+            times_seen=1,
+        )
         
         if not request.is_ajax():
             return HttpResponseRedirect(request.META.get('HTTP_REFERER') or reverse('sentry'))
