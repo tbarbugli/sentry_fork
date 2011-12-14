@@ -81,6 +81,7 @@
             {% with group|chart_data as chart_data %}
                 {% if chart_data %}
                 <script type="text/javascript">
+                var now = new Date();
                 $(document).ready(function() {
                     new Highcharts.Chart({
                         chart: {
@@ -122,12 +123,12 @@
                         tooltip: {
                             formatter: function() {
                                 return '<strong>'+
-                                    Highcharts.dateFormat('%A %B %e %Y<br/>%I:00 %p', this.x) + '</strong><br/>'+
+                                    Highcharts.dateFormat('%A %B %e %Y<br/>%H:00', this.x) + '</strong><br/>'+
                                     this.y+' records';
                             }
                         },
                         series: [{
-                            pointStart: new Date() - {{ chart_data.points|length }} * 3600000,
+                            pointStart: now - ({{ chart_data.points|length }}-2) * 3600000,
                             pointInterval: 3600 * 1000,
                             type: 'area',
                             data: {{ chart_data.points|to_json }}
