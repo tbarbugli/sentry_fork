@@ -46,11 +46,11 @@ class SentryManager(models.Manager):
         return qs
 
     def _get_group_by_view(self, kwargs):
-        class_name = kwargs.get("class_name", "")
-        message = kwargs.get("message", "")
-        for k in settings.EXCEPTION_GROUP_LIST.iterkeys():
+        class_name = kwargs.get("class_name", "") or ""
+        message = kwargs.get("message", "") or ""
+        for k, v in settings.EXCEPTION_GROUP_LIST.iteritems():
             if re.search(k[0], class_name) and re.search(k[1], message):
-                return settings.EXCEPTION_GROUP_LIST[k]
+                return "group %s" % v 
         return None
 
     def from_kwargs(self, **kwargs):
@@ -99,8 +99,7 @@ class SentryManager(models.Manager):
                 # if the message should be grouped use the group_name to select
                 # existing groups (avoid more specific groups)
                 gc_kwargs = dict(view=group_name)
-                group_kwargs = {'class_name': kwargs.get("class_name"),
-                                'checksum': checksum, 'logger':logger_name}
+                group_kwargs = {}
             group, created = GroupedMessage.objects.get_or_create(
                 # we store some sample data for rendering
                 defaults=group_kwargs,
