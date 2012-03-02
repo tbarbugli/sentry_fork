@@ -80,7 +80,7 @@ INTERNAL_IPS = set()
 SERVER_EMAIL = 'root@localhost'
 
 LOGIN_URL = None
-SENTRY_EMAIL_SWITCH = 'sentry.switches.Switch'
+SENTRY_EMAIL_SWITCH = 'sentry.switches.SwitchManager'
 ## The following settings refer to the built-in webserver
 
 WEB_HOST = 'localhost'

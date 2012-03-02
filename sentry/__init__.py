@@ -8,3 +8,5 @@ try:
         .get_distribution('django-sentry').version
 except Exception, e:
     VERSION = 'unknown'
+
+import switches

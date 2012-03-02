@@ -25,6 +25,7 @@ from sentry.plugins import GroupActionProvider
 from sentry.templatetags.sentry_helpers import with_priority
 from sentry.utils import json
 from sentry.web.reporter import ImprovedExceptionReporter
+from sentry.switches import ThrottleSwitch
 
 uuid_re = re.compile(r'^[a-z0-9]{32}$')
 
@@ -193,6 +194,8 @@ def index(request):
         'any_filter': any_filter,
         'request': request,
         'filters': filters,
+        'throughput': ThrottleSwitch.get_throughput_per_second(),
+        'throttling': ThrottleSwitch.is_throttled()
     })
 
 @login_required

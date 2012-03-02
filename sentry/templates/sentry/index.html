@@ -3,7 +3,12 @@
 {% load i18n %}
 {% load sentry_helpers %}
 
-{% block heading %}{% trans "Dashboard" %}{% endblock %}
+{% block heading %}{% trans "Dashboard" %} 
+<h class="count message" style="margin-left:1em;">{{ throughput|floatformat:2 }} errors/sec </h4>
+{% if throttling %}
+<span class="priority-veryhigh" style='text-align: right;'><span class="count">Throttling email</span></span>
+{% endif %}
+{% endblock %}
 
 {% block sidebar %}
     {% if chart_url %}

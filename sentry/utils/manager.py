@@ -158,8 +158,9 @@ class SentryManager(models.Manager):
             try:
                 module, class_name = settings.SENTRY_EMAIL_SWITCH.rsplit('.', 1)
                 _switch = getattr(__import__(module, {}, {}, class_name), class_name)
-                mail = mail or _switch(group, logger_name).send_email()
+                mail = mail or _switch.send_email(group=group, logger_name=logger_name)
             except Exception, exc:
+                print exc
                 logger.exception(u'Something went wrong with email switch class: %s' % (exc,))
             if mail:
                 group.mail_admins()
