@@ -105,7 +105,6 @@ class ThrottleSwitch(Switch):
         now = datetime.now()
         normalized_now = cls.normalize_dt(now)
         cls.incr(normalized_now)
-        return cls.get_throughput_per_second(normalized_now)
 
     @classmethod
     def incr(cls, dt):
@@ -125,9 +124,12 @@ class ThrottleSwitch(Switch):
 
     @classmethod
     def should_send(cls, *args, **kwargs):
+        group = kwargs['group']
         limit, period = cls.THROTTLE_RATE.split('/')
         limit = float(limit)
-        num = cls.update_throughput_per_second()
+        if group.times_seen == 1:
+            cls.update_throughput_per_second()
+        num = cls.get_throughput_per_second()
         threshold = num / {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}[period[0]]
         return not cls.is_throttled(limit < threshold)
 
